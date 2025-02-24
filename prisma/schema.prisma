@@ -1,0 +1,76 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" // Change based on your DB
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  JOB_SEEKER
+  EMPLOYER
+}
+
+enum ApplicationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+model User {
+  id       Int     @id @default(autoincrement()) // Changed to auto-increment integer
+  name     String
+  email    String  @unique
+  password String
+  role     Role
+  imagePath String?
+
+  employerProfile EmployerProfile?
+  jobSeekerProfile JobSeekerProfile?
+  jobs     Job[]
+  applications Application[]
+}
+
+model EmployerProfile {
+  id            Int    @id @default(autoincrement()) // Changed to auto-increment integer
+  userId        Int    @unique
+  companyName   String
+  companyWebsite String?
+
+  user          User   @relation(fields: [userId], references: [id])
+}
+
+model JobSeekerProfile {
+  id      Int    @id @default(autoincrement()) // Changed to auto-increment integer
+  userId  Int    @unique
+  resume  String
+  skills  String
+
+  user    User   @relation(fields: [userId], references: [id])
+}
+
+model Job {
+  id         Int     @id @default(autoincrement()) // Changed to auto-increment integer
+  title      String
+  description String
+  Category String
+  company    String
+  location   String
+  salary     Float
+  employerId Int
+
+  employer   User   @relation(fields: [employerId], references: [id],onDelete: Cascade)
+  applications Application[]
+}
+
+model Application {
+  id           Int     @id @default(autoincrement()) // Changed to auto-increment integer
+  jobId        Int
+  jobSeekerId  Int
+  status       ApplicationStatus @default(PENDING)
+  appliedAt    DateTime @default(now())
+
+  job          Job   @relation(fields: [jobId], references: [id])
+  jobSeeker    User  @relation(fields: [jobSeekerId], references: [id])
+}
