@@ -10,7 +10,7 @@ export interface AuthRequest extends Request {
 }
 
 
-export const verifyToken = (req: AuthRequest, res: Response, next: NextFunction) => {
+export const authMiddleware = (req: AuthRequest, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
     
     console.log("Authorization Header:", authHeader);

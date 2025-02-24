@@ -56,7 +56,7 @@ export const createJob = async (req: AuthRequest, res: Response) => {
       return;
     }
 
-    const { title, description, company, location, salary, Category } = req.body;
+    const { title, description, company, location, salary, category } = req.body;
 
     const newJob = await prisma.job.create({
       data: {
@@ -65,7 +65,7 @@ export const createJob = async (req: AuthRequest, res: Response) => {
         company,
         location,
         salary,
-        Category,
+        category,
         employerId: userId!,
         // give me a json to try
         // 

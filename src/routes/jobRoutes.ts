@@ -7,15 +7,16 @@ import {
     getJobsByEmployer,
     getJobById
 } from '../controllers/jobController';
-import { verifyToken } from '../middleware/authMiddleware';
-
+import { authMiddleware } from '../middleware/authMiddleware';
+import { validationMiddleware } from '../middleware/validationMiddleware';
+import { jobSchema } from '../validations/jobValidation';
 const router = Router();
 
-router.post('/create', verifyToken,createJob);
-router.delete('/:id', verifyToken,deleteJob);
-router.put('/:id', verifyToken,updateJob);
+router.post('/create', authMiddleware,validationMiddleware(jobSchema),createJob);
+router.delete('/:id', authMiddleware,deleteJob);
+router.put('/:id', authMiddleware,validationMiddleware(jobSchema),updateJob);
 
-router.get('/employer',verifyToken,getJobsByEmployer)
+router.get('/employer',authMiddleware,getJobsByEmployer)
 router.get('/:id',getJobById)
 router.get('/',getAllJobs);
 

@@ -5,20 +5,20 @@ import {
   getApplicationsForJob,
   getApplicationsForJobSeeker,
 } from '../controllers/applicationController';
-import { verifyToken } from '../middleware/authMiddleware';
+import { authMiddleware } from '../middleware/authMiddleware';
 
 const router = Router();
 
 // Job Seeker applies for a job
-router.post('/apply/:id', verifyToken, applyForJob);
+router.post('/apply/:id', authMiddleware, applyForJob);
 
 // Employer updates application status (Accepted/Rejected)
-router.put('/status/:id', verifyToken, updateApplicationStatus);
+router.put('/status/:id', authMiddleware, updateApplicationStatus);
 
 // Employer fetches applications for a job
-router.get('/job/:id', verifyToken, getApplicationsForJob);
+router.get('/job/:id', authMiddleware, getApplicationsForJob);
 
 // Job Seeker fetches all applications they've made
-router.get('/seeker', verifyToken, getApplicationsForJobSeeker);
+router.get('/myapplies', authMiddleware, getApplicationsForJobSeeker);
 
 export default router;
