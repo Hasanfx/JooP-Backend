@@ -33,7 +33,7 @@ export const login = async (req: Request, res: Response) => {
         // Set the token in an HTTP-only cookie
       res.cookie("token", token, {
           httpOnly: true,
-          secure:true, // Use HTTPS in production
+          secure:false, // Use HTTPS in production
           sameSite: "strict",
           maxAge: 60 * 60 * 1000 // 1 hour
       });
@@ -83,7 +83,7 @@ export const logout = (req: Request, res: Response) => {
   // Clear the HTTP-only 'token' cookie
   res.clearCookie("token", {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production", // HTTPS in production
+    secure: false, // HTTPS in production
     sameSite: "strict" // Prevent CSRF attacks
   });
   // Send confirmation response

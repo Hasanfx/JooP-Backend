@@ -5,7 +5,7 @@ import rootRoute from "./routes/rootRoutes";
 
 dotenv.config(); // Load environment variables
 
-const app = express();
+ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
@@ -37,3 +37,5 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
+
+export {app}
