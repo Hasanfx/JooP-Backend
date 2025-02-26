@@ -38,7 +38,7 @@ model EmployerProfile {
   companyName   String
   companyWebsite String?
 
-  user          User   @relation(fields: [userId], references: [id])
+  user          User   @relation(fields: [userId], references: [id],onDelete: Cascade)
 }
 
 model JobSeekerProfile {
@@ -47,7 +47,7 @@ model JobSeekerProfile {
   resume  String
   skills  String
 
-  user    User   @relation(fields: [userId], references: [id])
+  user    User   @relation(fields: [userId], references: [id],onDelete: Cascade)
 }
 
 model Job {
@@ -72,5 +72,5 @@ model Application {
   appliedAt    DateTime @default(now())
 
   job          Job   @relation(fields: [jobId], references: [id],onDelete: Cascade)
-  jobSeeker    User  @relation(fields: [jobSeekerId], references: [id])
+  jobSeeker    User  @relation(fields: [jobSeekerId], references: [id],onDelete: Cascade)
 }

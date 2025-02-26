@@ -1,73 +1,93 @@
-import { Router } from 'express';
-import authRoutes from '../../routes/authRoutes';
-import { login, signup, logout } from '../../controllers/authController';
-import { authMiddleware } from '../../middleware/authMiddleware';
-import { validationMiddleware } from '../../middleware/validationMiddleware';
-import { userSchema, userLoginSchema } from '../../validations/userValidation';
+import request from "supertest";
+import { prisma } from "../../config";
+import {app} from "../../server"; // Ensure this points to your Express app
+import { hashSync } from "bcryptjs";
 
-// Mock the router and its methods
-const mockRouter = {
-  post: jest.fn()
-};
 
-jest.mock('express', () => ({
-  Router: jest.fn(() => mockRouter)
-}));
+describe("Auth Routes", () => {
+  let user: { email: string; password: string };
 
-// Mock the route handlers and middleware
-jest.mock('../../controllers/authController', () => ({
-  login: jest.fn(),
-  signup: jest.fn(),
-  logout: jest.fn()
-}));
+  beforeAll(async () => {
+    // Clean database
+    await prisma.application.deleteMany();
+    await prisma.jobSeekerProfile.deleteMany();
+    await prisma.user.deleteMany();
 
-jest.mock('../../middleware/authMiddleware', () => jest.fn());
-jest.mock('../../middleware/validationMiddleware', () => jest.fn());
-jest.mock('../../validations/userValidation', () => ({
-  userSchema: {},
-  userLoginSchema: {}
-}));
+    // Create a test user
+    user = {
+      email: "testuser@example.com",
+      password: "Test1234",
+    };
 
-describe('Auth Routes', () => {
-  beforeEach(() => {
-    // Clear all mocks before each test
-    jest.clearAllMocks();
-    // Initialize the routes
-    authRoutes(mockRouter);
+    await prisma.user.create({
+      data: {
+        email: user.email,
+        name: "Test User",
+        password: hashSync(user.password, 10),
+        role: "JOB_SEEKER", // Adjust according to your schema
+      },
+    });
   });
 
-  it('should configure POST /login route', () => {
-    expect(mockRouter.post).toHaveBeenCalledWith(
-      '/login',
-      validationMiddleware(userLoginSchema),
-      login
-    );
+  afterAll(async () => {
+    await prisma.$disconnect();
   });
 
-  it('should configure POST /signup route', () => {
-    expect(mockRouter.post).toHaveBeenCalledWith(
-      '/signup',
-      validationMiddleware(userSchema),
-      signup
-    );
+  test("should sign up a new user", async () => {
+    const res = await request(app).post("/api/auth/signup").send({
+      email: "newuser@example.com",
+      name: "New User",
+      password: "SecurePass123",
+      role: "EMPLOYER",
+    });
+
+    expect(res.status).toBe(201);
+    expect(res.body).toHaveProperty("id");
+    expect(res.body.email).toBe("newuser@example.com");
   });
 
-  it('should configure POST /logout route', () => {
-    expect(mockRouter.post).toHaveBeenCalledWith(
-      '/logout',
-      authMiddleware,
-      logout
-    );
+  test("should not allow duplicate signup", async () => {
+    const res = await request(app).post("/api/auth//signup").send({
+      email: user.email, // Existing email
+      name: "Another User",
+      password: "AnotherPass123",
+      role: "JOB_SEEKER",
+    });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty("error", "Email already exists");
   });
 
-  it('should attach authMiddleware to protected routes', () => {
-    // Verify authMiddleware is used in the logout route
-    expect(authMiddleware).toHaveBeenCalled();
+  test("should login with valid credentials", async () => {
+    const res = await request(app).post("/api/auth/login").send({
+      email: user.email,
+      password: user.password,
+    });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty("token");
+    expect(res.body.data.email).toBe(user.email);
   });
 
-  it('should attach validationMiddleware to routes requiring validation', () => {
-    // Verify validationMiddleware is used in login and signup routes
-    expect(validationMiddleware).toHaveBeenCalledWith(userLoginSchema);
-    expect(validationMiddleware).toHaveBeenCalledWith(userSchema);
+  test("should reject login with incorrect password", async () => {
+    const res = await request(app).post("/api/auth/login").send({
+      email: user.email,
+      password: "WrongPassword123",
+    });
+
+    expect(res.status).toBe(401);
+    expect(res.body).toHaveProperty("message", "Invalid Password");
   });
+
+  test("should reject login for non-existent user", async () => {
+    const res = await request(app).post("/api/auth/login").send({
+      email: "nonexistent@example.com",
+      password: "SomePass123",
+    });
+
+    expect(res.status).toBe(401);
+    expect(res.body).toHaveProperty("message", "Invalid User");
+  });
+
+ 
 });

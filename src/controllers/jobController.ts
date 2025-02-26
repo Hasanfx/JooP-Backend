@@ -1,8 +1,9 @@
 import { Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import { AuthRequest } from "../middleware/authMiddleware";
+import {prisma} from '../config'
 
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient();
 
 // ✅ Get a single job by ID
 export const getJobById = async (req: AuthRequest, res: Response) => {
@@ -67,13 +68,13 @@ export const createJob = async (req: AuthRequest, res: Response) => {
         salary,
         category,
         employerId: userId!,
-        // give me a json to try
+        // give me a json request to try
+
+        
         // 
       },
     });
 
-    console.log(req.body)
-    console.log(newJob)
     res.status(201).json(newJob);
   } catch (error) {
     console.log("Error creating job:", error);
@@ -100,14 +101,12 @@ export const updateJob = async (req: AuthRequest, res: Response) => {
     }
 
     
-    const { title, description, company } = req.body;
+    const { title, description, company,salary,category,location } = req.body;
 
     const updatedJob = await prisma.job.update({
       where: { id: jobId },
-      data: { title, description, company },
+      data: { title, description, company,salary,category,location },
     });
-    console.log(req.body)
-    console.log(updatedJob)
 
     res.json(updatedJob);
   } catch (error) {

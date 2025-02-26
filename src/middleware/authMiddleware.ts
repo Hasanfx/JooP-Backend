@@ -13,7 +13,6 @@ export interface AuthRequest extends Request {
 export const authMiddleware = (req: AuthRequest, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
     
-    console.log("Authorization Header:", authHeader);
   
     if (!authHeader?.startsWith("Bearer ")) {
         res.status(401).json({ error: "Unauthorized: Invalid format" });
@@ -25,7 +24,6 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
     try {
   
         const decoded = jwt.verify(token, JWT_SECRET!) as any;
-        console.log(decoded.userId);
         
         req.userId = decoded.userId; 
         req.userRole = decoded.userRole;

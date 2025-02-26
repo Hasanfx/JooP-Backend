@@ -33,9 +33,9 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
   res.status(500).send("Something broke!");
 });
 
-// Start Server
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+if (process.env.NODE_ENV !== "test") {
+  app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });}
 
 export {app}

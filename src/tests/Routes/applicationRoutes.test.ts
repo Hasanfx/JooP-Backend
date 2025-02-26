@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import applicationRoute from '../../routes/applicationRoute';
 import { 
   applyForJob,
   updateApplicationStatus,
@@ -10,7 +11,9 @@ import { validationMiddleware } from '../../middleware/validationMiddleware';
 import { applicationSchema } from '../../validations/applicationValidation';
 
 jest.mock('../../controllers/applicationController');
-jest.mock('../../middleware/authMiddleware');
+jest.mock('../../middleware/authMiddleware', () => {
+  return jest.fn((req, res, next) => next());
+});
 jest.mock('../../middleware/validationMiddleware');
 jest.mock('../../validations/applicationValidation');
 
@@ -19,7 +22,7 @@ describe('Application Routes', () => {
 
   beforeEach(() => {
     router = Router();
-    require('../../routes/applicationRoute')(router);
+    applicationRoute(router);
   });
 
   it('should configure POST /applications route', () => {

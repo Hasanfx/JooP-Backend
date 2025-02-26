@@ -9,7 +9,6 @@ const prisma = new PrismaClient();
 
 export const login = async (req: Request, res: Response) => {
 
-  console.log("Received Data:", req.body);
   const { email, password } = req.body;
   
   
@@ -26,7 +25,6 @@ export const login = async (req: Request, res: Response) => {
       res.status(401).json({ message: "Invalid Password" });
       return;
     }
-    console.log(user.role)
     
     const token = jwt.sign({ userId: user.id,userRole:user.role }, JWT_SECRET!);
 
@@ -41,7 +39,6 @@ export const login = async (req: Request, res: Response) => {
       const data = await prisma.user.findUnique({where:{
         id:user.id
       }})
-      console.log(data,token)
     res.json({ data, token });
 
 
@@ -54,7 +51,6 @@ export const login = async (req: Request, res: Response) => {
 export const signup = async (req: Request, res: Response) => {
   const { email, name, password,role } = req.body;
 
-  console.log("Received Data:", req.body);
 
   try {
     const existingUser = await prisma.user.findFirst({ where: { email } });
@@ -71,7 +67,6 @@ export const signup = async (req: Request, res: Response) => {
         role
       },
     });
-    console.log()
     res.status(201).json(user);
   } catch (error:any) {
     console.log(error.message)
