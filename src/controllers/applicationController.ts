@@ -1,8 +1,6 @@
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
 import { AuthRequest } from '../middleware/authMiddleware';
-
-const prisma = new PrismaClient();
+import { prisma } from '../config';
 
 // ✅ Apply for a job
 export const applyForJob = async (req: AuthRequest, res: Response) => {
@@ -113,14 +111,12 @@ export const getApplicationsForJob = async (req: AuthRequest, res: Response) => 
         res.status(404).json({ message: 'Job not found' });
         return;
     }
-    console.log(job)
 
     // Fetch all applications for the job
     const applications = await prisma.application.findMany({
       where: { jobId },
       include: { jobSeeker: true }, // Include the job seeker's details
     });
-    console.log(applications)
 
     res.json(applications);
   } catch (error) {
