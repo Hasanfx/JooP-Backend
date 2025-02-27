@@ -10,6 +10,7 @@ export const userSchema = z.object({
   role: z.enum(userRoleEnum).refine(val => userRoleEnum.includes(val), {
     message: "Invalid role value", // Custom error message
   }),
+  imagePath : z.string().optional()
 });
 
 export const userLoginSchema = z.object({
