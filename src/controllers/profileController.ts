@@ -2,8 +2,9 @@
 import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import { AuthRequest } from "../middleware/authMiddleware";
+import {prisma} from '../config'
 
-const prisma = new PrismaClient();
+
 
 // Get Profile (Employer or Job Seeker)
 export const getProfile = async (req: AuthRequest, res: Response) => {

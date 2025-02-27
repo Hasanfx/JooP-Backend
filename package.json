@@ -7,8 +7,9 @@
     "dev": "nodemon",
     "build": "tsc",
     "start": "node dist/server.js",
-    "test":"jest"
+    "test":"jest --maxWorkers=1"
   },
+
   "keywords": [],
   "author": "",
   "license": "ISC",

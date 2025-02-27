@@ -8,10 +8,16 @@ describe("Auth Routes", () => {
   let user: { email: string; password: string };
 
   beforeAll(async () => {
+    jest.clearAllMocks();
+
     // Clean database
-    await prisma.application.deleteMany();
-    await prisma.jobSeekerProfile.deleteMany();
-    await prisma.user.deleteMany();
+    await prisma.$transaction([
+      prisma.application.deleteMany(),
+      prisma.jobSeekerProfile.deleteMany(),
+      prisma.user.deleteMany(),
+    ]);
+    
+    
 
     // Create a test user
     user = {
@@ -19,14 +25,15 @@ describe("Auth Routes", () => {
       password: "Test1234",
     };
 
-    await prisma.user.create({
+   const a= await prisma.user.create({
       data: {
         email: user.email,
         name: "Test User",
-        password: hashSync(user.password, 10),
+        password: hashSync(user.password, 1),
         role: "JOB_SEEKER", // Adjust according to your schema
       },
     });
+    console.log(a)
   });
 
   afterAll(async () => {
@@ -47,7 +54,7 @@ describe("Auth Routes", () => {
   });
 
   test("should not allow duplicate signup", async () => {
-    const res = await request(app).post("/api/auth//signup").send({
+    const res = await request(app).post("/api/auth/signup").send({
       email: user.email, // Existing email
       name: "Another User",
       password: "AnotherPass123",
@@ -90,4 +97,4 @@ describe("Auth Routes", () => {
   });
 
  
-});
+},);

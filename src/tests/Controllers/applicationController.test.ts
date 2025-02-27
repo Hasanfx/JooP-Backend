@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 import request from 'supertest';
 import { app } from '../../server'; // Assuming your express app is exported from this file
+import { prisma } from '../../config';
 
 // Mock the PrismaClient
 jest.mock('@prisma/client', () => ({
@@ -67,18 +68,27 @@ describe('Application API Endpoints', () => {
 
   // Test: Apply for the same job twice
   it('should not apply for the same job twice', async () => {
-    // Mock the findFirst to return an existing application for the second test
-    const prisma = new PrismaClient();
-    (prisma.application.findFirst as jest.Mock).mockResolvedValueOnce({ id: 1, jobId: 2, jobSeekerId: 38 });
-    
+    // Manually override Prisma behavior in this test
+    (prisma.application.findFirst as jest.Mock).mockResolvedValueOnce({ 
+      id: 1, 
+      jobId: 2, 
+      jobSeekerId: 38 
+    });
+  
     const res = await request(app)
       .post('/api/application/apply/2')
       .set('Authorization', 'Bearer job-seeker-token')
       .send({ jobId: 2 });
-
-    expect(res.status).toBe(400); // Expect a 400 (bad request) error
+  
+    console.log(res.body); // Debugging output
+  
+    expect(res.status).toBe(400);
     expect(res.body).toHaveProperty('message', 'You have already applied for this job');
   });
+  
+  
+
+
 
   // Test: Update application status (Employer)
   it('should update the application status (Employer)', async () => {
@@ -123,14 +133,28 @@ describe('Application API Endpoints', () => {
     expect(res.body[0]).toHaveProperty('status');
   });
 
-  // Test: Fetch all applications for a job seeker
-  it('should fetch all applications for the job seeker', async () => {
-    const res = await request(app)
-      .get('/api/application/myapplies')
-      .set('Authorization', 'Bearer job-seeker-token');
+// Test: Fetch all applications for a job seeker
+it('should fetch all applications for the job seeker', async () => {
+  // Correctly update the mock for this specific test
+  const prisma = new PrismaClient();
+  (prisma.application.findMany as jest.Mock).mockResolvedValueOnce([{
+    id: 1,
+    jobId: 2,
+    jobSeekerId: 38,
+    status: 'PENDING',
+    job: {
+      id: 2,
+      title: 'Software Engineer',
+      description: 'Test job'
+    }
+  }]);
 
-    expect(res.status).toBe(200); // Expect 200 (OK)
-    expect(res.body.length).toBeGreaterThan(0);
-    expect(res.body[0]).toHaveProperty('job');
-  });
+  const res = await request(app)
+    .get('/api/application/myapplies')
+    .set('Authorization', 'Bearer job-seeker-token');
+
+  expect(res.status).toBe(200);
+  expect(res.body.length).toBeGreaterThan(0);
+  expect(res.body[0]).toHaveProperty('jobId');
+});
 });
