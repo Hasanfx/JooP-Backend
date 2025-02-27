@@ -49,7 +49,7 @@ export const login = async (req: Request, res: Response) => {
 };
 
 export const signup = async (req: Request, res: Response) => {
-  const { email, name, password,role } = req.body;
+  const { email, name, password,role,imagePath } = req.body;
 
 
   try {
@@ -64,7 +64,8 @@ export const signup = async (req: Request, res: Response) => {
         email,
         name,
         password: hashSync(password, 10),
-        role
+        role,
+        imagePath
       },
     });
     res.status(201).json(user);

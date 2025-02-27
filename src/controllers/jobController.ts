@@ -5,7 +5,7 @@ import {prisma} from '../config'
 
 // const prisma = new PrismaClient();
 
-// ✅ Get a single job by ID
+//  Get a single job by ID
 export const getJobById = async (req: AuthRequest, res: Response) => {
   try {
     const jobId = Number(req.params.id);
@@ -23,7 +23,7 @@ export const getJobById = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// ✅ Get all jobs (for homepage, public)
+//  Get all jobs (for homepage, public)
 export const getAllJobs = async (_req: AuthRequest, res: Response) => {
   try {
     const jobs = await prisma.job.findMany();
@@ -34,7 +34,7 @@ export const getAllJobs = async (_req: AuthRequest, res: Response) => {
   }
 };
 
-// ✅ Get all jobs by the logged-in employer
+//  Get all jobs by the logged-in employer
 export const getJobsByEmployer = async (req: AuthRequest, res: Response) => {
   try {
     const { userId } = req;
@@ -47,7 +47,7 @@ export const getJobsByEmployer = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// ✅ Create a new job
+//  Create a new job
 export const createJob = async (req: AuthRequest, res: Response) => {
   try {
     const { userId, userRole } = req;
@@ -68,10 +68,7 @@ export const createJob = async (req: AuthRequest, res: Response) => {
         salary,
         category,
         employerId: userId!,
-        // give me a json request to try
 
-        
-        // 
       },
     });
 
@@ -82,7 +79,7 @@ export const createJob = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// ✅ Update job details
+//  Update job details
 export const updateJob = async (req: AuthRequest, res: Response) => {
   try {
     const { userId } = req;
@@ -115,7 +112,7 @@ export const updateJob = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// ✅ Delete a job
+//  Delete a job
 export const deleteJob = async (req: AuthRequest, res: Response) => {
   try {
     const { userId } = req;

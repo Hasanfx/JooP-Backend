@@ -3,7 +3,6 @@ import * as jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../config";
 import { PrismaClient } from "@prisma/client";
 
-// Extend Request type to include userId
 export interface AuthRequest extends Request {
   userId?: number;
   userRole?: string;

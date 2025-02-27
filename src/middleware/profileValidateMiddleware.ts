@@ -23,7 +23,7 @@ export const validateProfileMiddleware = (req: AuthRequest, res: Response, next:
         res.status(400).json({ message: "Invalid role" });
       return
     }
-    next(); // If validation passes, move to the next middleware/controller
+    next();
   } catch (error:any) {
       res.status(400).json({ message: "Validation failed", errors: error.errors });
     return 
